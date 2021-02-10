@@ -12,7 +12,7 @@
     },
     {
       "id": 3,
-      "title": "Garlic Pepper Salt",
+      "title": "simple spice",
       "image": "./assets/spices/garlicsalt.jpg"
     },
     {
@@ -106,6 +106,21 @@
       "name": "Pepper",
       "spiceblendId": 3,
       "id": 17
+    },
+    {
+      "spiceblendId": 1,
+      "name": "potato",
+      "id": 18
+    },
+    {
+      "spiceblendId": 2,
+      "name": "starch",
+      "id": 19
+    },
+    {
+      "spiceblendId": 3,
+      "name": "more pepper",
+      "id": 20
     }
   ]
 }

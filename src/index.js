@@ -3,34 +3,62 @@ const detailDiv = document.querySelector('#spice-blend-detail')
 const ingredientsList = detailDiv.querySelector('.ingredients-list')
 const updateForm = document.querySelector('#update-form')
 const ingredientForm = document.querySelector('#ingredient-form')
+const imageContainer = document.querySelector("#spice-images")
 
-function preloadSpice(){
-    fetch('http://localhost:3000/spiceblends/1')
+function preloadSpices(){
+    fetch('http://localhost:3000/spiceblends/')
+    .then(res => res.json())
+    .then(spices => {
+        spices.forEach( spice => {
+            renderSpiceImage(spice)
+        })
+        loadSpice(spices[0].id)
+    })
+
+    
+}
+
+function renderSpiceImage(spice){
+    let image = document.createElement('img')
+    image.src = spice.image
+    image.alt = spice.title
+    image.dataset.id = spice.id
+
+    imageContainer.append(image)
+
+}
+function loadSpice(id){
+    fetch(`http://localhost:3000/spiceblends/${id}`)
     .then(res => res.json())
     .then(renderSpice)
 }
 
-function renderSpice(spice){
-    let image = detailDiv.querySelector('img')
-    let title = detailDiv.querySelector('.title')
+function renderSpice({id, image, title, ingredients}){
+    let divimage = detailDiv.querySelector('img')
+    let divtitle = detailDiv.querySelector('.title')
 
-    image.src = spice.image
-    title.textContent = spice.title
+    divimage.src = image
+    divtitle.textContent = title
 
-    spice.ingredients.forEach(ingredient => {
+    ingredientsList.innerHTML = ""
+    ingredients.forEach(ingredient => {
         addIngredient(ingredient.name)
     });
+
+    updateForm.dataset.id = id
+    ingredientForm.dataset.id = id
 }
 
 function updateTitle(e){
     e.preventDefault()
     let title = e.target.title.value
-    fetch('http://localhost:3000/spiceblends/1',{
+    let id = e.target.dataset.id
+    fetch(`http://localhost:3000/spiceblends/${id}`,{
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({title: title})
+        body: JSON.stringify({title})
     })
 
     detailDiv.querySelector('.title').textContent = title
@@ -47,15 +75,32 @@ function addIngredient(name){
 function getIngredient(e){
     e.preventDefault()
     let name = e.target.name.value
+    let spiceblendId = parseInt(e.target.dataset.id)
     addIngredient(name)
+    updateIngredient({spiceblendId, name})
 
-        e.target.reset()
+    e.target.reset()
+}
 
+function updateIngredient(newIngredient){
+    fetch('http://localhost:3000/ingredients',{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newIngredient)
+    })
+}
+
+function handleClick(e){
+    let id = e.target.dataset.id
+    loadSpice(id)
 }
 
 
 updateForm.addEventListener('submit', updateTitle)
 ingredientForm.addEventListener('submit', getIngredient)
+imageContainer.addEventListener('click', handleClick)
 
 
 
@@ -63,5 +108,4 @@ ingredientForm.addEventListener('submit', getIngredient)
 
 
 
-
-preloadSpice()
+preloadSpices()
